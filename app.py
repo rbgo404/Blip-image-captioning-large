@@ -1,27 +1,23 @@
-from vllm import LLM, SamplingParams
-from transformers import AutoTokenizer
+import torch
+import requests
+from PIL import Image
+from transformers import BlipProcessor, BlipForConditionalGeneration
 
 class InferlessPythonModel:
     def initialize(self):
-        model_id = "meta-llama/Meta-Llama-3.1-8B-Instruct"
-        self.llm = LLM(model=model_id,dtype="float16")
-        self.tokenizer = AutoTokenizer.from_pretrained(model_id)
+        self.processor = BlipProcessor.from_pretrained("Salesforce/blip-image-captioning-large")
+        self.model = BlipForConditionalGeneration.from_pretrained("Salesforce/blip-image-captioning-large", torch_dtype=torch.float16,device_map="cuda")
 
     def infer(self, inputs):
-        prompts = inputs["prompt"]
-        temperature = inputs.get("temperature",0.7)
-        top_p = inputs.get("top_p",0.1)
-        repetition_penalty = inputs.get("repetition_penalty",1.18)
-        top_k = inputs.get("top_k",40)
-        max_tokens = inputs.get("max_tokens",256)
-
-        sampling_params = SamplingParams(temperature=temperature,top_p=top_p,repetition_penalty=repetition_penalty,
-                                         top_k=top_k,max_tokens=max_tokens)
-        input_text = self.tokenizer.apply_chat_template([{"role": "user", "content": prompts}], tokenize=False)
-        result = self.llm.generate(input_text, sampling_params)
-        result_output = [output.outputs[0].text for output in result]
-
-        return {'result': result_output[0]}
+        img_url = inputs["img_url"]
+        text = inputs.get("text")
+        
+        raw_image = Image.open(requests.get(img_url, stream=True).raw).convert('RGB')
+        inputs = self.processor(raw_image,text, return_tensors="pt").to("cuda", torch.float16)     
+        out = self.model.generate(**inputs)
+        generated_output = self.processor.decode(out[0], skip_special_tokens=True)
+        
+        return {'generated_output': generated_output}
 
     def finalize(self):
-        self.llm = None
+        self.model = None
