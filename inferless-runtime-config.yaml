@@ -1,5 +1,7 @@
 build:
   cuda_version: "12.1.1"
   python_packages:
-    - "vllm==0.5.3.post1"
-    - "transformers==4.43.1"
+    - "accelerate==0.34.2"
+    - "transformers==4.44.2"
+    - "torch==2.4.1"
+    - "pillow==10.4.0"
