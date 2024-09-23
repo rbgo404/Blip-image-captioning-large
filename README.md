@@ -1,8 +1,8 @@
 # Blip-image-captioning-large
 The Salesforce/blip-image-captioning-large model is a image captioning model developed as part of the BLIP (Bootstrapping Language-Image Pre-training) framework. This model is specifically designed for  image captioning pretrained on COCO dataset.
 
-## Deploy BLIP-2 using Inferless:
-- Deployment of BLIP-2 model using [transformers](https://github.com/huggingface/transformers).
+## Deploy Blip-image-captioning-large using Inferless:
+- Deployment of Blip-image-captioning-large model using [transformers](https://github.com/huggingface/transformers).
 ---
 ## Prerequisites
 - **Git**. You would need git installed on your system if you wish to customize the repo after forking.
@@ -52,7 +52,7 @@ curl --location '<your_inference_url>' \
                     "name": "text",
                     "optional": true,
                     "shape": [1],
-                    "data": ["Explain the image."],
+                    "data": ["a photography of"],
                     "datatype": "BYTES"
                     }
                 ]
